@@ -1,0 +1,257 @@
+import assert from "node:assert/strict";
+import { execFileSync } from "node:child_process";
+import { existsSync, readFileSync, statSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+import test from "node:test";
+
+const pagePath = new URL("../app/page.tsx", import.meta.url);
+const contentPath = new URL("../app/content.ts", import.meta.url);
+const cssPath = new URL("../app/globals.css", import.meta.url);
+const neuralFieldPath = new URL("../app/NeuralField.tsx", import.meta.url);
+const experiencePath = new URL("../app/PortfolioExperience.tsx", import.meta.url);
+const researchDemosPath = new URL("../app/ResearchDemos.tsx", import.meta.url);
+const layoutPath = new URL("../app/layout.tsx", import.meta.url);
+const workerPath = new URL("../worker/index.ts", import.meta.url);
+const robotsPath = new URL("../public/robots.txt", import.meta.url);
+const sitemapPath = new URL("../public/sitemap.xml", import.meta.url);
+const siteOriginPath = new URL("../app/site-origin.ts", import.meta.url);
+const robotsRoutePath = new URL("../app/robots.ts", import.meta.url);
+const sitemapRoutePath = new URL("../app/sitemap.ts", import.meta.url);
+const nextConfigPath = new URL("../next.config.ts", import.meta.url);
+const packagePath = new URL("../package.json", import.meta.url);
+const noJekyllPath = new URL("../public/.nojekyll", import.meta.url);
+const pagesWorkflowPath = new URL("../.github/workflows/deploy-pages.yml", import.meta.url);
+const readmePath = new URL("../README.md", import.meta.url);
+const page = readFileSync(pagePath, "utf8");
+const content = existsSync(contentPath) ? readFileSync(contentPath, "utf8") : "";
+const css = readFileSync(cssPath, "utf8");
+const neuralField = existsSync(neuralFieldPath) ? readFileSync(neuralFieldPath, "utf8") : "";
+const experience = existsSync(experiencePath) ? readFileSync(experiencePath, "utf8") : "";
+const researchDemos = existsSync(researchDemosPath) ? readFileSync(researchDemosPath, "utf8") : "";
+const layout = existsSync(layoutPath) ? readFileSync(layoutPath, "utf8") : "";
+const worker = existsSync(workerPath) ? readFileSync(workerPath, "utf8") : "";
+const siteOrigin = existsSync(siteOriginPath) ? readFileSync(siteOriginPath, "utf8") : "";
+const robotsRoute = existsSync(robotsRoutePath) ? readFileSync(robotsRoutePath, "utf8") : "";
+const sitemapRoute = existsSync(sitemapRoutePath) ? readFileSync(sitemapRoutePath, "utf8") : "";
+const nextConfig = existsSync(nextConfigPath) ? readFileSync(nextConfigPath, "utf8") : "";
+const packageJson = JSON.parse(readFileSync(packagePath, "utf8"));
+const pagesWorkflow = existsSync(pagesWorkflowPath) ? readFileSync(pagesWorkflowPath, "utf8") : "";
+const readme = readFileSync(readmePath, "utf8");
+
+test("the portfolio exposes four switchable views", () => {
+  for (const view of ["home", "projects", "research", "profile"]) {
+    assert.match(content, new RegExp(`href: [\\"']#${view}[\\"']`));
+  }
+  assert.match(experience, /type ViewId = "home" \| "projects" \| "research" \| "profile"/);
+  assert.match(experience, /activeView/);
+  assert.match(experience, /hashchange/);
+  assert.match(experience, /className="view-navigation"/);
+});
+
+test("the hero communicates Fengkai's research positioning", () => {
+  assert.match(content, /Fengkai Gao/);
+  assert.match(content, /Researcher/);
+  assert.doesNotMatch(content, /AI Student/);
+  assert.match(content, /Computer Vision/);
+  assert.match(content, /Vision-Language Models/);
+  assert.match(content, /Generative Models/);
+});
+
+test("the portfolio provides complete English and Chinese content", () => {
+  assert.match(content, /export const portfolioContent/);
+  assert.match(content, /English/);
+  assert.match(content, /中文/);
+  assert.match(content, /研究者/);
+  assert.match(content, /北京师范大学-香港浸会大学联合国际学院/);
+  assert.match(content, /人工智能/);
+});
+
+test("the portfolio presents three project outcomes without publication claims", () => {
+  assert.match(content, /Detecting Semantic Manipulation in Structured Academic Figures/);
+  assert.match(content, /Training-Free Concept Disentanglement/);
+  assert.match(content, /Revisiting FreeU/);
+  assert.equal((content.match(/status: "Project outcome"/g) ?? []).length, 3);
+  assert.equal((content.match(/cover: "\/images\/papers\//g) ?? []).length, 3);
+  for (const cover of ["semantic-figure-manipulation", "detection-guided-attention", "dynamic-freeu"]) {
+    assert.match(content, new RegExp(`${cover}\\.webp`));
+  }
+  assert.doesNotMatch(content, /Completed paper|TechRxiv|preprint|submitted|accepted|published/i);
+  assert.doesNotMatch(content, /AutoDraftman|In progress/);
+});
+
+test("the profile uses verified contact and education details without excluded claims", () => {
+  assert.match(content, /Beijing Normal-Hong Kong Baptist University/);
+  assert.match(content, /Artificial Intelligence undergraduate/);
+  assert.match(content, /t330034007@mail\.bnbu\.edu\.cn/);
+  assert.match(content, /https:\/\/github\.com\/QCYTSN/);
+  for (const course of ["Machine Learning", "Natural Language Processing", "Big Data", "Computer Vision", "Bayesian Networks"]) {
+    assert.match(content, new RegExp(course));
+  }
+  assert.doesNotMatch(content, /GPA|3\.01|award|prize|17784321536/i);
+});
+
+test("primary navigation and calls to action use real view anchors", () => {
+  assert.match(experience, /href=[\"']#projects/);
+  assert.match(content, /href: [\"']#research[\"']/);
+  assert.match(experience, /content\.navigation\.map/);
+  assert.match(content, /href: [\"']#profile[\"']/);
+});
+
+test("the full-screen experience includes contact, language, loading, and view transition controls", () => {
+  assert.match(page, /PortfolioExperience/);
+  assert.match(experience, /className="site-loader"/);
+  assert.match(experience, /className="language-toggle"/);
+  assert.match(experience, /className="header-contact"/);
+  assert.match(experience, /className="view-transition"/);
+  assert.match(experience, /setTransitioning/);
+  assert.match(css, /min-height:\s*100svh/);
+  assert.match(css, /\.site-loader/);
+  assert.match(css, /\.reveal-ready/);
+});
+
+test("the visual system preserves visible focus and reduced motion", () => {
+  assert.match(css, /:focus-visible/);
+  assert.match(css, /prefers-reduced-motion:\s*reduce/);
+});
+
+test("the public portfolio declares canonical search and sharing metadata", () => {
+  assert.match(siteOrigin, /https:\/\/peanut-ai\.dev/);
+  assert.match(layout, /canonical:/);
+  assert.match(layout, /index: true/);
+  assert.match(layout, /follow: true/);
+  assert.match(layout, /openGraph:/);
+  assert.match(layout, /twitter:/);
+  assert.match(robotsRoute, /allow: "\/"/);
+  assert.match(robotsRoute, /sitemap:/);
+  assert.match(sitemapRoute, /changeFrequency: "monthly"/);
+});
+
+test("the same source supports a root GitHub Pages static export", () => {
+  assert.match(siteOrigin, /GITHUB_PAGES/);
+  assert.match(siteOrigin, /https:\/\/qcytsn\.github\.io/);
+  assert.match(siteOrigin, /https:\/\/peanut-ai\.dev/);
+  assert.match(layout, /SITE_ORIGIN/);
+  assert.match(robotsRoute, /MetadataRoute\.Robots/);
+  assert.match(robotsRoute, /SITE_ORIGIN/);
+  assert.match(robotsRoute, /dynamic\s*=\s*"force-static"/);
+  assert.match(sitemapRoute, /MetadataRoute\.Sitemap/);
+  assert.match(sitemapRoute, /SITE_ORIGIN/);
+  assert.match(sitemapRoute, /dynamic\s*=\s*"force-static"/);
+  assert.match(nextConfig, /output:\s*"export"/);
+  assert.match(nextConfig, /unoptimized:\s*true/);
+  assert.equal(packageJson.scripts["build:pages"], "GITHUB_PAGES=true next build");
+  assert.equal(existsSync(noJekyllPath), true);
+  assert.equal(existsSync(robotsPath), false);
+  assert.equal(existsSync(sitemapPath), false);
+});
+
+test("GitHub Actions deploys the verified static export to Pages", () => {
+  assert.match(pagesWorkflow, /pages:\s*write/);
+  assert.match(pagesWorkflow, /id-token:\s*write/);
+  assert.match(pagesWorkflow, /node-version:\s*["']?22/);
+  assert.match(pagesWorkflow, /npm ci/);
+  assert.match(pagesWorkflow, /npm run build:pages/);
+  assert.match(pagesWorkflow, /actions\/upload-pages-artifact@/);
+  assert.match(pagesWorkflow, /actions\/deploy-pages@/);
+  assert.match(readme, /https:\/\/qcytsn\.github\.io/);
+  assert.match(readme, /npm run build:pages/);
+});
+
+test("the worker defines a defense-in-depth response header policy", () => {
+  for (const header of ["Content-Security-Policy", "Strict-Transport-Security", "X-Content-Type-Options", "X-Frame-Options", "Referrer-Policy", "Permissions-Policy", "X-Robots-Tag"]) {
+    assert.match(worker, new RegExp(header));
+  }
+  assert.match(worker, /withSecurityHeaders/);
+});
+
+test("each paper has a web-readable PDF and cover preview", () => {
+  for (const stem of ["semantic-figure-manipulation", "detection-guided-attention", "dynamic-freeu"]) {
+    assert.equal(existsSync(new URL(`../public/papers/${stem}.pdf`, import.meta.url)), true);
+    assert.equal(existsSync(new URL(`../public/images/papers/${stem}.png`, import.meta.url)), true);
+  }
+});
+
+test("paper covers load as static assets without the runtime image optimizer", () => {
+  assert.match(experience, /<Image[\s\S]*?unoptimized/);
+});
+
+test("project covers use smaller WebP assets and language changes update the document", () => {
+  for (const stem of ["semantic-figure-manipulation", "detection-guided-attention", "dynamic-freeu"]) {
+    const png = new URL(`../public/images/papers/${stem}.png`, import.meta.url);
+    const webp = new URL(`../public/images/papers/${stem}.webp`, import.meta.url);
+    assert.equal(existsSync(webp), true);
+    assert.ok(statSync(webp).size < statSync(png).size);
+    assert.match(content, new RegExp(`${stem}\\.webp`));
+  }
+  assert.match(experience, /document\.documentElement\.lang/);
+  assert.match(experience, /language === "zh" \? "zh-CN" : "en"/);
+});
+
+test("the hero uses a dimensional AI neural field instead of a rotating poster", () => {
+  assert.match(experience, /import \{ NeuralField \} from "\.\/NeuralField"/);
+  assert.match(experience, /<NeuralField \/>/);
+  assert.match(neuralField, /className="neural-field"/);
+  assert.match(neuralField, /onPointerMove/);
+  assert.match(neuralField, /--pointer-x/);
+  assert.match(neuralField, /neural-layer/);
+  assert.match(neuralField, /signal-path/);
+  assert.match(css, /perspective:/);
+  assert.doesNotMatch(experience, /FolioIllustration/);
+});
+
+test("research directions open three nested conceptual demo pages", () => {
+  for (const slug of ["visual-reasoning", "vlm-evaluation", "generative-models"]) {
+    assert.match(content, new RegExp(`slug: [\\"']${slug}[\\"']`));
+    assert.match(experience, new RegExp(`#research/${slug}`));
+  }
+  assert.match(experience, /type ResearchId/);
+  assert.match(experience, /activeResearch/);
+  assert.match(experience, /setActiveResearch/);
+  assert.match(experience, /research-back/);
+  assert.match(experience, /ResearchDemo/);
+  assert.match(content, /Interactive conceptual demo/);
+  assert.match(content, /交互式概念演示/);
+});
+
+test("research demos provide evidence, robustness, and generation controls", () => {
+  assert.match(researchDemos, /export function VisualEvidenceDemo/);
+  assert.match(researchDemos, /evidence-scanner/);
+  assert.match(researchDemos, /onPointerMove/);
+  assert.match(researchDemos, /export function VlmRobustnessDemo/);
+  assert.match(researchDemos, /type="range"/);
+  assert.match(researchDemos, /corruption/);
+  assert.match(researchDemos, /export function GenerativeControlDemo/);
+  assert.match(researchDemos, /denoising/);
+  assert.match(researchDemos, /structure/);
+  assert.match(researchDemos, /texture/);
+  assert.match(css, /\.research-detail/);
+  assert.match(css, /\.demo-stage/);
+});
+
+test("each research demo has a collapsed bilingual explanation guide", () => {
+  assert.match(content, /How to read this demo/);
+  assert.match(content, /如何理解这个演示/);
+  for (const heading of ["What to observe", "Try this", "Why it happens", "观察什么", "如何操作", "为什么会这样"]) {
+    assert.match(content, new RegExp(heading));
+  }
+  assert.equal((content.match(/guide: \[/g) ?? []).length, 6);
+  assert.match(experience, /<details className="demo-explainer">/);
+  assert.match(experience, /<summary>/);
+  assert.match(experience, /demo-explainer-content/);
+  assert.match(experience, /<ResearchDemo[\s\S]*?<details className="demo-explainer">/);
+});
+
+test("research navigation and demo explanations have distinct responsive styling", () => {
+  assert.match(css, /\.research-back\s*\{[^}]*border:/s);
+  assert.match(css, /\.research-back\s*\{[^}]*background:/s);
+  assert.match(css, /\.demo-explainer/);
+  assert.match(css, /\.demo-explainer\[open\]/);
+  assert.match(css, /\.demo-explainer-content/);
+  assert.match(css, /@media \(max-width: 820px\)[\s\S]*?\.demo-explainer-content/s);
+});
+
+test("the public FreeU paper copy excludes student IDs and the coauthor email", () => {
+  const pdfPath = fileURLToPath(new URL("../public/papers/dynamic-freeu.pdf", import.meta.url));
+  const extracted = execFileSync("pdftotext", [pdfPath, "-"], { encoding: "utf8" });
+  assert.doesNotMatch(extracted, /2330034007|2330034079|t330034007@uic\.edu\.cn|t330034079@uic\.edu\.cn/);
+});
