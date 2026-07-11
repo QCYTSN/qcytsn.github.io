@@ -20,6 +20,10 @@ const sitemapRoutePath = new URL("../app/sitemap.ts", import.meta.url);
 const nextConfigPath = new URL("../next.config.ts", import.meta.url);
 const packagePath = new URL("../package.json", import.meta.url);
 const noJekyllPath = new URL("../public/.nojekyll", import.meta.url);
+const faviconSvgPath = new URL("../public/favicon.svg", import.meta.url);
+const faviconPngPath = new URL("../public/favicon-32x32.png", import.meta.url);
+const faviconIcoPath = new URL("../public/favicon.ico", import.meta.url);
+const appleTouchIconPath = new URL("../public/apple-touch-icon.png", import.meta.url);
 const pagesWorkflowPath = new URL("../.github/workflows/deploy-pages.yml", import.meta.url);
 const readmePath = new URL("../README.md", import.meta.url);
 const page = readFileSync(pagePath, "utf8");
@@ -37,6 +41,23 @@ const nextConfig = existsSync(nextConfigPath) ? readFileSync(nextConfigPath, "ut
 const packageJson = JSON.parse(readFileSync(packagePath, "utf8"));
 const pagesWorkflow = existsSync(pagesWorkflowPath) ? readFileSync(pagesWorkflowPath, "utf8") : "";
 const readme = readFileSync(readmePath, "utf8");
+
+test("the site uses the selected FG identity across browser icon formats", () => {
+  assert.match(layout, /favicon\.svg/);
+  assert.match(layout, /favicon-32x32\.png/);
+  assert.match(layout, /favicon\.ico/);
+  assert.match(layout, /apple-touch-icon\.png/);
+
+  for (const assetPath of [faviconSvgPath, faviconPngPath, faviconIcoPath, appleTouchIconPath]) {
+    assert.equal(existsSync(assetPath), true, `${fileURLToPath(assetPath)} should exist`);
+    assert.ok(statSync(assetPath).size > 0, `${fileURLToPath(assetPath)} should not be empty`);
+  }
+
+  const faviconSvg = readFileSync(faviconSvgPath, "utf8");
+  assert.match(faviconSvg, />FG</);
+  assert.match(faviconSvg, /#f4f0e4/i);
+  assert.match(faviconSvg, /#111714/i);
+});
 
 test("the portfolio exposes four switchable views", () => {
   for (const view of ["home", "projects", "research", "profile"]) {
