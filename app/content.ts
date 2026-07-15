@@ -17,6 +17,10 @@ const papers = [
       zh: "基准设计 · 视觉语言模型评估 · 结构化视觉推理",
     },
     tags: ["Scientific figures", "VLM evaluation", "Visual integrity"],
+    figureAlt: {
+      en: "Pipeline for detecting semantic manipulation in structured academic figures",
+      zh: "结构化学术图表语义篡改检测流程图",
+    },
     cover: "/images/papers/semantic-figure-pipeline.png",
     pdf: "/papers/semantic-figure-manipulation.pdf",
     code: "https://github.com/QCYTSN/DSMAF_Light",
@@ -37,6 +41,10 @@ const papers = [
       zh: "免训练控制 · 交叉注意力 · 概念解耦",
     },
     tags: ["Text-to-image", "Diffusion", "Attention control"],
+    figureAlt: {
+      en: "Detection-guided attention control method pipeline for text-to-image generation",
+      zh: "文本生成图像的检测引导注意力控制方法流程图",
+    },
     cover: "/images/papers/detection-guided-pipeline.png",
     pdf: "/papers/detection-guided-attention.pdf",
     code: "https://github.com/QCYTSN/Training-Free-Concept-Disentanglement-in-T2I-Generation-via-Detection-Guided-Attention-Control",
@@ -57,6 +65,10 @@ const papers = [
       zh: "频域分析 · U-Net 特征 · 动态调制",
     },
     tags: ["Diffusion", "FreeU", "Frequency domain"],
+    figureAlt: {
+      en: "Dynamic FreeU method pipeline with frequency analysis and feature modulation",
+      zh: "结合频域分析与特征调制的 Dynamic FreeU 方法流程图",
+    },
     cover: "/images/papers/dynamic-freeu-pipeline.png",
     pdf: "/papers/dynamic-freeu.pdf",
     code: null,

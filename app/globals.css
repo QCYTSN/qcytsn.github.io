@@ -548,6 +548,7 @@ h1 { max-width: 760px; margin-bottom: 0; font-size: clamp(54px, 5vw, 84px); line
   :root { --gutter: 17px; }
   .profile-view { padding-inline: 24px; }
   .language-toggle { min-width: 44px; min-height: 44px; justify-content: center; }
+  .wordmark { min-height: 44px; }
   .wordmark > span:last-child { font-size: 19px; }
   .view-navigation a { display: flex; justify-content: center; }
   .view-navigation a > span { display: none; }
@@ -558,7 +559,7 @@ h1 { max-width: 760px; margin-bottom: 0; font-size: clamp(54px, 5vw, 84px); line
   .hero-description { padding-left: 17px; font-size: 14px; }
   .hero-actions { align-items: stretch; flex-direction: column; gap: 10px; }
   .button-primary { width: 100%; min-width: 0; }
-  .text-link { justify-content: space-between; }
+  .text-link { min-height: 44px; justify-content: space-between; }
   .interaction-hint { display: none; }
   .hero-visual,
   .neural-field { height: 430px; }
@@ -592,12 +593,14 @@ h1 { max-width: 760px; margin-bottom: 0; font-size: clamp(54px, 5vw, 84px); line
   .profile-intro > p:last-child { font-size: 16px; line-height: 1.65; }
   .paper-card { grid-template-columns: 1fr; gap: 25px; }
   .paper-visual { max-width: 360px; }
+  .paper-actions { gap: 8px; }
+  .paper-actions a { min-height: 44px; padding-block: 0; align-items: center; }
   .research-entry { grid-template-columns: 30px 1fr; gap: 15px; }
   .research-entry p, .research-entry > strong { grid-column: 2; }
   .research-entry > i { display: none; }
   .research-detail-heading h2 { font-size: 42px; }
   .demo-stage { box-shadow: 7px 8px 0 rgba(21,25,24,.075); }
-  .entity-selector button, .corruption-selector button, .prompt-panel button, .demo-reset, .research-back { min-height: 44px; }
+  .entity-selector button, .corruption-selector button, .prompt-token-selector button, .demo-reset, .research-back { min-height: 44px; }
   .robustness-controls input, .generation-controls input { height: 44px; }
   .evidence-readout { align-items: flex-start; flex-direction: column; }
   .relation-readout { width: 100%; justify-content: space-between; }

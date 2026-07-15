@@ -1,12 +1,13 @@
 "use client";
 
 import Image from "next/image";
-import { useCallback, useEffect, useState, type MouseEvent } from "react";
+import { useCallback, useEffect, useRef, useState, type MouseEvent } from "react";
 import { NeuralField } from "./NeuralField";
 import { ResearchDemo, type ResearchId } from "./ResearchDemos";
 import { portfolioContent, type Language } from "./content";
 
 type ViewId = "home" | "projects" | "research" | "profile";
+type PortfolioRoute = { view: ViewId; research: ResearchId | null };
 
 const viewIds: ViewId[] = ["home", "projects", "research", "profile"];
 const researchIds: ResearchId[] = ["visual-reasoning", "vlm-evaluation", "generative-models"];
@@ -19,7 +20,7 @@ const VIEW_COVER_MS = 180;
 const VIEW_RELEASE_MS = 40;
 const Arrow = ({ diagonal = false }: { diagonal?: boolean }) => <span aria-hidden="true">{diagonal ? "↗" : "→"}</span>;
 
-function routeFromHash(hash: string): { view: ViewId; research: ResearchId | null } {
+function routeFromHash(hash: string): PortfolioRoute {
   const candidate = hash.replace("#", "");
   if (candidate.startsWith("research/")) {
     const research = candidate.split("/")[1] as ResearchId;
@@ -36,6 +37,11 @@ export function PortfolioExperience() {
   const [loading, setLoading] = useState(true);
   const [transitioning, setTransitioning] = useState(false);
   const [pageVisible, setPageVisible] = useState(true);
+  const coverTimeoutRef = useRef<number | null>(null);
+  const releaseTimeoutRef = useRef<number | null>(null);
+  const committedRouteRef = useRef<PortfolioRoute>({ view: "home", research: null });
+  const pendingRouteRef = useRef<PortfolioRoute | null>(null);
+  const showRouteRef = useRef<(next: ViewId, research: ResearchId | null, updateHistory: boolean) => void>(() => {});
   const content = portfolioContent[language];
   const selectedResearch = content.interests.find((interest) => interest.slug === activeResearch) ?? null;
 
@@ -55,19 +61,49 @@ export function PortfolioExperience() {
     return () => document.removeEventListener("visibilitychange", syncVisibility);
   }, []);
 
+  const clearPendingTransition = useCallback(() => {
+    if (coverTimeoutRef.current !== null) window.clearTimeout(coverTimeoutRef.current);
+    if (releaseTimeoutRef.current !== null) window.clearTimeout(releaseTimeoutRef.current);
+    coverTimeoutRef.current = null;
+    releaseTimeoutRef.current = null;
+    pendingRouteRef.current = null;
+  }, []);
+
   const showRoute = useCallback((next: ViewId, research: ResearchId | null, updateHistory: boolean) => {
-    if (next === activeView && research === activeResearch) return;
+    const destination = { view: next, research: next === "research" ? research : null };
+    const committed = committedRouteRef.current;
+    const pending = pendingRouteRef.current;
+
+    if (pending?.view === destination.view && pending.research === destination.research) return;
+    clearPendingTransition();
+    if (committed.view === destination.view && committed.research === destination.research) {
+      setTransitioning(false);
+      return;
+    }
+
+    pendingRouteRef.current = destination;
     setTransitioning(true);
-    window.setTimeout(() => {
-      setActiveView(next);
-      setActiveResearch(next === "research" ? research : null);
+    coverTimeoutRef.current = window.setTimeout(() => {
+      if (pendingRouteRef.current !== destination) return;
+      coverTimeoutRef.current = null;
+      pendingRouteRef.current = null;
+      committedRouteRef.current = destination;
+      setActiveView(destination.view);
+      setActiveResearch(destination.research);
       if (updateHistory) {
-        window.history.pushState(null, "", research ? researchHashes[research] : `#${next}`);
+        window.history.pushState(null, "", destination.research ? researchHashes[destination.research] : `#${destination.view}`);
       }
       window.scrollTo({ top: 0, behavior: "instant" });
-      window.setTimeout(() => setTransitioning(false), VIEW_RELEASE_MS);
+      releaseTimeoutRef.current = window.setTimeout(() => {
+        releaseTimeoutRef.current = null;
+        setTransitioning(false);
+      }, VIEW_RELEASE_MS);
     }, VIEW_COVER_MS);
-  }, [activeResearch, activeView]);
+  }, [clearPendingTransition]);
+
+  useEffect(() => {
+    showRouteRef.current = showRoute;
+  }, [showRoute]);
 
   const showView = useCallback((next: ViewId, updateHistory: boolean) => {
     showRoute(next, null, updateHistory);
@@ -76,6 +112,7 @@ export function PortfolioExperience() {
   useEffect(() => {
     const initialFrame = window.requestAnimationFrame(() => {
       const initialRoute = routeFromHash(window.location.hash);
+      committedRouteRef.current = initialRoute;
       if (initialRoute.view !== "home") setActiveView(initialRoute.view);
       setActiveResearch(initialRoute.research);
     });
@@ -85,7 +122,7 @@ export function PortfolioExperience() {
       window.cancelAnimationFrame(historyFrame);
       historyFrame = window.requestAnimationFrame(() => {
         const route = routeFromHash(window.location.hash);
-        showRoute(route.view, route.research, false);
+        showRouteRef.current(route.view, route.research, false);
       });
     };
     window.addEventListener("hashchange", handleHistoryChange);
@@ -93,10 +130,11 @@ export function PortfolioExperience() {
     return () => {
       window.cancelAnimationFrame(initialFrame);
       window.cancelAnimationFrame(historyFrame);
+      clearPendingTransition();
       window.removeEventListener("hashchange", handleHistoryChange);
       window.removeEventListener("popstate", handleHistoryChange);
     };
-  }, [showRoute]);
+  }, [clearPendingTransition]);
 
   const navigate = (view: ViewId) => (event: MouseEvent<HTMLAnchorElement>) => {
     event.preventDefault();
@@ -196,7 +234,7 @@ export function PortfolioExperience() {
                   <div className="paper-visual">
                     <div className="paper-visual-head"><span>PROJECT / {String(index + 1).padStart(2, "0")}</span><span>{paper.year}</span></div>
                     <div className="paper-image-frame">
-                      <Image src={paper.cover} alt={`Project report cover for ${paper.shortTitle}`} width={1105} height={1430} sizes="(max-width: 820px) 84vw, 26vw" unoptimized />
+                      <Image src={paper.cover} alt={paper.figureAlt[language]} width={1105} height={1430} sizes="(max-width: 820px) 84vw, 26vw" unoptimized />
                     </div>
                   </div>
                   <div className="paper-copy">

@@ -73,3 +73,13 @@ test("renders the portfolio identity, papers, verified links, and section anchor
   assert.match(html, /dynamic-freeu-pipeline\.png/);
   assert.doesNotMatch(html, /AutoDraftman|In progress|GPA|3\.01|17784321536/i);
 });
+
+test("renders accurate project figure alternatives", async () => {
+  const response = await renderHome();
+  const html = await response.text();
+
+  assert.match(html, /alt=["']Pipeline for detecting semantic manipulation/);
+  assert.match(html, /alt=["']Detection-guided attention control method pipeline/);
+  assert.match(html, /alt=["']Dynamic FreeU method pipeline/);
+  assert.doesNotMatch(html, /Project report cover/);
+});

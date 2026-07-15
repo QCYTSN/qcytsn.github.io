@@ -286,7 +286,7 @@ test("research demo refinements preserve readable copy, touch scrolling, and ind
   assert.match(css, /\.spectrum i\s*\{[^}]*var\(--texture\)[^}]*transition:\s*height var\(--motion-state\) var\(--ease-state\), opacity var\(--motion-fast\) ease/s);
   assert.match(css, /\.attribute-shape\s*\{[^}]*transition:\s*translate var\(--motion-state\) var\(--ease-out\)/s);
   assert.doesNotMatch(css, /\.attribute-shape\s*\{[^}]*transition:\s*all/s);
-  assert.match(css, /@media \(max-width: 560px\)[\s\S]*?\.entity-selector button, \.corruption-selector button, \.prompt-panel button, \.demo-reset, \.research-back\s*\{\s*min-height:\s*44px;/);
+  assert.match(css, /@media \(max-width: 560px\)[\s\S]*?\.entity-selector button, \.corruption-selector button, \.prompt-token-selector button, \.demo-reset, \.research-back\s*\{\s*min-height:\s*44px;/);
   assert.match(css, /@media \(max-width: 560px\)[\s\S]*?\.robustness-controls input, \.generation-controls input\s*\{\s*height:\s*44px;/);
 });
 
@@ -340,6 +340,42 @@ test("motion pauses offscreen and history restores portfolio routes", () => {
   assert.match(css, /\[data-page-visible="false"\]/);
   assert.match(css, /animation-play-state:\s*paused/);
   assert.match(css, /@media \(prefers-reduced-motion: reduce\)/);
+});
+
+test("route transitions cancel stale destinations and keep history listeners stable", () => {
+  assert.match(experience, /useRef/);
+  assert.match(experience, /coverTimeoutRef/);
+  assert.match(experience, /releaseTimeoutRef/);
+  assert.match(experience, /pendingRouteRef/);
+  assert.match(experience, /clearPendingTransition/);
+  assert.match(experience, /pendingRouteRef\.current[\s\S]*?next[\s\S]*?research/);
+  assert.match(experience, /return \(\) => \{[\s\S]*?clearPendingTransition\(\)/);
+  assert.match(experience, /showRouteRef\.current/);
+  assert.match(experience, /\}, \[\]\);/);
+});
+
+test("all selectable research demo choices expose their programmatic selected state", () => {
+  assert.match(researchDemos, /className="corruption-selector" role="group" aria-label=\{labels\.corruption\}/);
+  assert.match(researchDemos, /setCorruption\(index\)[\s\S]*?aria-pressed=\{corruption === index\}/);
+  assert.match(researchDemos, /className="prompt-token-selector" role="group" aria-label=\{labels\.prompt\}/);
+  assert.match(researchDemos, /setToken\(index\)[\s\S]*?aria-pressed=\{token === index\}/);
+});
+
+test("project pipeline figures have accurate localized descriptions", () => {
+  assert.equal((content.match(/figureAlt:\s*\{/g) ?? []).length, 3);
+  assert.equal((content.match(/en:\s*"[^"]*(?:pipeline|method)[^"]*"/gi) ?? []).length >= 3, true);
+  assert.equal((content.match(/zh:\s*"[^"]+"/g) ?? []).length >= 3, true);
+  assert.match(experience, /alt=\{paper\.figureAlt\[language\]\}/);
+  assert.doesNotMatch(experience, /Project report cover/);
+});
+
+test("mobile interactive targets use a restrained 44 pixel contract", () => {
+  const mobile = css.match(/@media \(max-width: 560px\) \{[\s\S]*?\n\}/)?.[0] ?? "";
+  assert.match(mobile, /\.wordmark[^}]*min-height:\s*44px/);
+  assert.match(mobile, /\.text-link[^}]*min-height:\s*44px/);
+  assert.match(mobile, /\.paper-actions a[^}]*min-height:\s*44px/);
+  assert.match(mobile, /\.paper-actions[^}]*gap:\s*8px/);
+  assert.match(mobile, /\.prompt-token-selector button[^}]*min-height:\s*44px/);
 });
 
 test("the Neural Field exposes three semantic research destinations", () => {

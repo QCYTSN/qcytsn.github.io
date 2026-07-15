@@ -187,7 +187,7 @@ export function VlmRobustnessDemo({ language }: { language: Language }) {
       </div>
       <div className="robustness-controls">
         <div className="corruption-selector" role="group" aria-label={labels.corruption}>
-          {labels.modes.map((mode, index) => <button key={mode} type="button" className={corruption === index ? "is-active" : ""} onClick={() => setCorruption(index)}>{mode}</button>)}
+          {labels.modes.map((mode, index) => <button key={mode} type="button" className={corruption === index ? "is-active" : ""} onClick={() => setCorruption(index)} aria-pressed={corruption === index}>{mode}</button>)}
         </div>
         <button className="demo-reset" type="button" onClick={resetVlm}>{labels.reset}</button>
         <label>
@@ -226,7 +226,7 @@ export function GenerativeControlDemo({ language }: { language: Language }) {
       <div className="generation-console">
         <div className="prompt-panel">
           <span>{labels.prompt}</span>
-          <div>{tokens.map((item, index) => <button key={item} type="button" className={token === index ? "is-active" : ""} onClick={() => setToken(index)}>{item}</button>)}</div>
+          <div className="prompt-token-selector" role="group" aria-label={labels.prompt}>{tokens.map((item, index) => <button key={item} type="button" className={token === index ? "is-active" : ""} onClick={() => setToken(index)} aria-pressed={token === index}>{item}</button>)}</div>
           <div className="latent-vector"><span>z<sub>t</sub></span>{Array.from({length:18},(_,index)=><i key={index} />)}</div>
         </div>
         <div className="latent-canvas">
