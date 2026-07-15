@@ -19,7 +19,9 @@ const copy = {
     confidence: "Model confidence",
     diagnosis: "Diagnosis",
     stable: "Stable visual grounding",
+    uncertain: "Evidence is weakening",
     failed: "Evidence localization failed",
+    reset: "Reset",
     denoising: "Denoising progress",
     structure: "Structure guidance",
     texture: "Texture energy",
@@ -40,7 +42,9 @@ const copy = {
     confidence: "模型置信度",
     diagnosis: "诊断结果",
     stable: "视觉定位稳定",
+    uncertain: "瑙嗚璇佹嵁姝ｅ湪鍑忓急",
     failed: "证据定位失败",
+    reset: "閲嶇疆",
     denoising: "去噪进度",
     structure: "结构引导",
     texture: "纹理能量",
@@ -54,18 +58,30 @@ export function VisualEvidenceDemo({ language }: { language: Language }) {
   const labels = copy[language];
   const [scan, setScan] = useState(54);
   const [selected, setSelected] = useState(1);
+  const [dragging, setDragging] = useState(false);
+  const entityScan = [43, 52, 81] as const;
 
-  const onPointerMove = (event: PointerEvent<HTMLDivElement>) => {
+  const updateScan = (event: PointerEvent<HTMLDivElement>) => {
     const bounds = event.currentTarget.getBoundingClientRect();
     setScan(Math.max(8, Math.min(92, ((event.clientX - bounds.left) / bounds.width) * 100)));
   };
 
   return (
-    <div className="demo-stage evidence-demo evidence-scanner" onPointerMove={onPointerMove} style={{ "--scan": `${scan}%` } as React.CSSProperties}>
+    <div className="demo-stage evidence-demo evidence-scanner" style={{ "--scan": `${scan}%` } as React.CSSProperties}>
       <div className="demo-toolbar">
         <span>{labels.scanner}</span><strong>{Math.round(scan)}%</strong>
       </div>
-      <div className="evidence-canvas">
+      <div
+        className="evidence-canvas"
+        onPointerDown={(event) => {
+          event.currentTarget.setPointerCapture(event.pointerId);
+          setDragging(true);
+          updateScan(event);
+        }}
+        onPointerMove={(event) => { if (dragging) updateScan(event); }}
+        onPointerUp={() => setDragging(false)}
+        onPointerCancel={() => setDragging(false)}
+      >
         <svg className="evidence-base" viewBox="0 0 760 430" role="img" aria-label="Structured chart scene">
           <rect width="760" height="430" fill="#e7dfcf" />
           <rect x="42" y="42" width="676" height="346" fill="#f8f4ea" stroke="#171b1a" strokeOpacity=".35" />
@@ -87,7 +103,7 @@ export function VisualEvidenceDemo({ language }: { language: Language }) {
             <rect x="126" y="122" width="394" height="216" className={`vision-box ${selected === 0 ? "is-selected" : ""}`} />
             <rect x="150" y="126" width="340" height="120" className={`vision-box vision-box-trend ${selected === 1 ? "is-selected" : ""}`} />
             <rect x="546" y="118" width="146" height="184" className={`vision-box ${selected === 2 ? "is-selected" : ""}`} />
-            <path d="M322 106C392 72 510 72 574 107M520 232C554 220 570 208 588 192" className="evidence-links" />
+            <path key={selected} d="M322 106C392 72 510 72 574 107M520 232C554 220 570 208 588 192" className="evidence-links" />
             <circle cx="322" cy="106" r="7" /><circle cx="574" cy="107" r="7" /><circle cx="520" cy="232" r="7" /><circle cx="588" cy="192" r="7" />
             <text x="132" y="116">ENTITY / PLOT</text><text x="552" y="112">ENTITY / CAPTION</text>
           </svg>
@@ -97,7 +113,16 @@ export function VisualEvidenceDemo({ language }: { language: Language }) {
       <div className="evidence-readout">
         <div className="entity-selector" role="group" aria-label={labels.evidence}>
           {labels.entities.map((entity, index) => (
-            <button key={entity} type="button" className={selected === index ? "is-active" : ""} onClick={() => setSelected(index)}>{String(index + 1).padStart(2,"0")} / {entity}</button>
+            <button
+              key={entity}
+              type="button"
+              className={selected === index ? "is-active" : ""}
+              onClick={() => {
+                setSelected(index);
+                setScan(entityScan[index]);
+              }}
+              aria-pressed={selected === index}
+            >{String(index + 1).padStart(2,"0")} / {entity}</button>
           ))}
         </div>
         <div className="relation-readout"><span>{labels.entities[selected]}</span><i /> <em>{labels.relation}</em><i /> <span>{labels.entities[(selected + 1) % 3]}</span></div>
@@ -106,12 +131,24 @@ export function VisualEvidenceDemo({ language }: { language: Language }) {
   );
 }
 
+type VlmPhase = "stable" | "uncertain" | "failed";
+
 export function VlmRobustnessDemo({ language }: { language: Language }) {
   const labels = copy[language];
   const [severity, setSeverity] = useState(24);
   const [corruption, setCorruption] = useState(0);
   const failureThreshold = [62, 54, 46][corruption];
-  const failed = severity >= failureThreshold;
+  const uncertainThreshold = failureThreshold - 18;
+  const phase: VlmPhase = severity >= failureThreshold
+    ? "failed"
+    : severity >= uncertainThreshold
+      ? "uncertain"
+      : "stable";
+  const failed = phase === "failed";
+  const resetVlm = () => {
+    setSeverity(24);
+    setCorruption(0);
+  };
   const confidence = Math.max(12, Math.round(96 - severity * (corruption === 2 ? .92 : .72)));
 
   return (
@@ -138,19 +175,29 @@ export function VlmRobustnessDemo({ language }: { language: Language }) {
           </div>
           <p>{labels.question}</p>
         </div>
-        <div className={`model-pane ${failed ? "has-failed" : ""}`}>
-          <span>MODEL RESPONSE</span>
-          <strong>{failed ? labels.wrong : labels.correct}</strong>
+        <div className={`model-pane phase-${phase}`}>
+          <div className="model-status" aria-live="polite">
+            <span>MODEL RESPONSE</span>
+            <strong>{failed ? labels.wrong : labels.correct}</strong>
+          </div>
           <div className="confidence-meter"><i style={{ width: `${confidence}%` }} /></div>
           <p><span>{labels.confidence}</span><b>{confidence}%</b></p>
-          <div className="diagnosis-card"><span>{labels.diagnosis}</span><strong>{failed ? labels.failed : labels.stable}</strong><i /></div>
+          <div className="diagnosis-card" aria-live="polite"><span>{labels.diagnosis}</span><strong>{phase === "failed" ? labels.failed : phase === "uncertain" ? labels.uncertain : labels.stable}</strong><i /></div>
         </div>
       </div>
       <div className="robustness-controls">
         <div className="corruption-selector" role="group" aria-label={labels.corruption}>
           {labels.modes.map((mode, index) => <button key={mode} type="button" className={corruption === index ? "is-active" : ""} onClick={() => setCorruption(index)}>{mode}</button>)}
         </div>
-        <label><span>{labels.corruption}</span><input type="range" min="0" max="100" value={severity} onChange={(event) => setSeverity(Number(event.target.value))} /><strong>{severity}%</strong></label>
+        <button className="demo-reset" type="button" onClick={resetVlm}>{labels.reset}</button>
+        <label>
+          <span>{labels.corruption}</span>
+          <span className="range-track">
+            <input type="range" min="0" max="100" value={severity} onChange={(event) => setSeverity(Number(event.target.value))} />
+            <i className="vlm-threshold" style={{ left: `${failureThreshold}%` }} aria-hidden="true" />
+          </span>
+          <strong>{severity}%</strong>
+        </label>
       </div>
     </div>
   );
@@ -165,7 +212,16 @@ export function GenerativeControlDemo({ language }: { language: Language }) {
   const tokens = ["red hat", "blue scarf", "gold light"];
 
   return (
-    <div className="demo-stage generative-demo" style={{ "--denoise": denoising / 100, "--structure": structure / 100, "--texture": texture / 100 } as React.CSSProperties}>
+    <div
+      className="demo-stage generative-demo"
+      style={{
+        "--denoise": denoising / 100,
+        "--structure": structure / 100,
+        "--texture": texture / 100,
+        "--attribute-offset": `${(50 - structure) * .18}px`,
+        "--edge-clarity": `${Math.max(0, 1.6 - texture * .016)}px`,
+      } as React.CSSProperties}
+    >
       <div className="demo-toolbar"><span>LATENT CONTROL CONSOLE</span><strong>SD / INFERENCE</strong></div>
       <div className="generation-console">
         <div className="prompt-panel">

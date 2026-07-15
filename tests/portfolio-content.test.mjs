@@ -249,6 +249,21 @@ test("research demos provide evidence, robustness, and generation controls", () 
   assert.match(css, /\.demo-stage/);
 });
 
+test("research demos use deliberate controls and readable derived states", () => {
+  assert.match(researchDemos, /const \[dragging, setDragging\] = useState\(false\)/);
+  assert.match(researchDemos, /setPointerCapture/);
+  assert.match(researchDemos, /type VlmPhase = "stable" \| "uncertain" \| "failed"/);
+  assert.match(researchDemos, /aria-live="polite"/);
+  assert.match(researchDemos, /resetVlm/);
+  assert.match(researchDemos, /uncertain: "Evidence is weakening"/);
+  assert.match(researchDemos, /reset: "Reset"/);
+  assert.match(researchDemos, /className={`model-pane phase-\$\{phase\}`}/);
+  assert.match(css, /\.phase-uncertain/);
+  assert.match(css, /\.vlm-threshold/);
+  assert.match(css, /--attribute-offset/);
+  assert.match(css, /--edge-clarity/);
+});
+
 test("each research demo has a collapsed bilingual explanation guide", () => {
   assert.match(content, /How to read this demo/);
   assert.match(content, /如何理解这个演示/);
