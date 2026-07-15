@@ -328,6 +328,18 @@ test("view navigation uses one restrained motion system", () => {
   assert.match(css, /\.nav-active-marker[^}]*transition:/s);
 });
 
+test("motion pauses offscreen and history restores portfolio routes", () => {
+  assert.match(experience, /const \[pageVisible, setPageVisible\] = useState/);
+  assert.match(experience, /visibilitychange/);
+  assert.match(experience, /popstate/);
+  assert.match(experience, /historyFrame/);
+  assert.match(experience, /data-page-visible=/);
+  assert.match(css, /\[aria-hidden="true"\][^{]*\*/);
+  assert.match(css, /\[data-page-visible="false"\]/);
+  assert.match(css, /animation-play-state:\s*paused/);
+  assert.match(css, /@media \(prefers-reduced-motion: reduce\)/);
+});
+
 test("the Neural Field exposes three semantic research destinations", () => {
   const activateDirection = neuralField.match(/const activateDirection = \(index: number\) => \{[\s\S]*?\n  \};/)?.[0] ?? "";
   assert.match(neuralField, /export type NeuralDirection/);

@@ -619,5 +619,25 @@ h1 { max-width: 760px; margin-bottom: 0; font-size: clamp(54px, 5vw, 84px); line
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
   .site-loader { display: none; }
   .neural-layer, .neural-ambient { transform: none !important; }
+  .signal-path circle { display: none; }
+  .nav-active-marker,
+  .neural-direction > i,
+  .neural-direction > span,
+  .evidence-links,
+  .model-pane,
+  .generated-portrait,
+  .attribute-shape,
+  .spatial-box,
+  .attention-heat,
+  .noise-field,
+  .spectrum i {
+    animation-duration: .01ms !important;
+    transition-duration: .01ms !important;
+  }
   .view-transition { display: none; }
+}
+
+.view-panel[aria-hidden="true"] *,
+.portfolio-page[data-page-visible="false"] * {
+  animation-play-state: paused !important;
 }

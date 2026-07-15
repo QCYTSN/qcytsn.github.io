@@ -35,6 +35,7 @@ export function PortfolioExperience() {
   const [activeResearch, setActiveResearch] = useState<ResearchId | null>(null);
   const [loading, setLoading] = useState(true);
   const [transitioning, setTransitioning] = useState(false);
+  const [pageVisible, setPageVisible] = useState(true);
   const content = portfolioContent[language];
   const selectedResearch = content.interests.find((interest) => interest.slug === activeResearch) ?? null;
 
@@ -46,6 +47,13 @@ export function PortfolioExperience() {
   useEffect(() => {
     document.documentElement.lang = language === "zh" ? "zh-CN" : "en";
   }, [language]);
+
+  useEffect(() => {
+    const syncVisibility = () => setPageVisible(document.visibilityState === "visible");
+    syncVisibility();
+    document.addEventListener("visibilitychange", syncVisibility);
+    return () => document.removeEventListener("visibilitychange", syncVisibility);
+  }, []);
 
   const showRoute = useCallback((next: ViewId, research: ResearchId | null, updateHistory: boolean) => {
     if (next === activeView && research === activeResearch) return;
@@ -72,14 +80,21 @@ export function PortfolioExperience() {
       setActiveResearch(initialRoute.research);
     });
 
-    const handleHashChange = () => {
-      const route = routeFromHash(window.location.hash);
-      showRoute(route.view, route.research, false);
+    let historyFrame = 0;
+    const handleHistoryChange = () => {
+      window.cancelAnimationFrame(historyFrame);
+      historyFrame = window.requestAnimationFrame(() => {
+        const route = routeFromHash(window.location.hash);
+        showRoute(route.view, route.research, false);
+      });
     };
-    window.addEventListener("hashchange", handleHashChange);
+    window.addEventListener("hashchange", handleHistoryChange);
+    window.addEventListener("popstate", handleHistoryChange);
     return () => {
       window.cancelAnimationFrame(initialFrame);
-      window.removeEventListener("hashchange", handleHashChange);
+      window.cancelAnimationFrame(historyFrame);
+      window.removeEventListener("hashchange", handleHistoryChange);
+      window.removeEventListener("popstate", handleHistoryChange);
     };
   }, [showRoute]);
 
@@ -96,7 +111,7 @@ export function PortfolioExperience() {
   const switchLanguage = () => setLanguage((current) => current === "en" ? "zh" : "en");
 
   return (
-    <main className={`portfolio-page ${loading ? "is-loading" : "reveal-ready"} ${transitioning ? "is-transitioning" : ""}`}>
+    <main className={`portfolio-page ${loading ? "is-loading" : "reveal-ready"} ${transitioning ? "is-transitioning" : ""}`} data-page-visible={pageVisible}>
       <div className="site-loader" aria-hidden={!loading} data-active={loading}>
         <div className="loader-mark" aria-hidden="true"><i /><i /><i /></div>
         <p>{content.loaderLabel}</p>
