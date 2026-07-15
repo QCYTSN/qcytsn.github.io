@@ -93,8 +93,8 @@ test("the portfolio presents three project outcomes without publication claims",
   assert.match(content, /Revisiting FreeU/);
   assert.equal((content.match(/status: "Project outcome"/g) ?? []).length, 3);
   assert.equal((content.match(/cover: "\/images\/papers\//g) ?? []).length, 3);
-  for (const cover of ["semantic-figure-manipulation", "detection-guided-attention", "dynamic-freeu"]) {
-    assert.match(content, new RegExp(`${cover}\\.webp`));
+  for (const cover of ["semantic-figure-pipeline", "detection-guided-pipeline", "dynamic-freeu-pipeline"]) {
+    assert.match(content, new RegExp(`${cover}\\.png`));
   }
   assert.doesNotMatch(content, /Completed paper|TechRxiv|preprint|submitted|accepted|published/i);
   assert.doesNotMatch(content, /AutoDraftman|In progress/);
@@ -196,13 +196,16 @@ test("paper covers load as static assets without the runtime image optimizer", (
   assert.match(experience, /<Image[\s\S]*?unoptimized/);
 });
 
-test("project covers use smaller WebP assets and language changes update the document", () => {
+test("project covers preserve fallback WebPs, use pipeline assets, and update document language", () => {
   for (const stem of ["semantic-figure-manipulation", "detection-guided-attention", "dynamic-freeu"]) {
     const png = new URL(`../public/images/papers/${stem}.png`, import.meta.url);
     const webp = new URL(`../public/images/papers/${stem}.webp`, import.meta.url);
     assert.equal(existsSync(webp), true);
     assert.ok(statSync(webp).size < statSync(png).size);
-    assert.match(content, new RegExp(`${stem}\\.webp`));
+  }
+  for (const asset of ["semantic-figure-pipeline.png", "detection-guided-pipeline.png", "dynamic-freeu-pipeline.png"]) {
+    assert.equal(existsSync(new URL(`../public/images/papers/${asset}`, import.meta.url)), true);
+    assert.match(content, new RegExp(asset.replace(".", "\\.")));
   }
   assert.match(experience, /document\.documentElement\.lang/);
   assert.match(experience, /language === "zh" \? "zh-CN" : "en"/);
@@ -349,4 +352,17 @@ test("the Neural Field exposes three semantic research destinations", () => {
   assert.match(experience, /onSelectResearch=/);
   assert.match(css, /\.neural-direction/);
   assert.match(css, /\.neural-field\.has-active-direction/);
+});
+
+test("project figures and mobile profile use the approved polished presentation", () => {
+  for (const asset of [
+    "semantic-figure-pipeline.png",
+    "detection-guided-pipeline.png",
+    "dynamic-freeu-pipeline.png",
+  ]) assert.match(content, new RegExp(asset.replace(".", "\\.")));
+  assert.match(css, /--rust:\s*#98472f/i);
+  assert.match(css, /\.paper-image-frame[^}]*aspect-ratio:\s*4\s*\/\s*3/s);
+  assert.match(css, /@media \(max-width: 560px\)[\s\S]*?\.profile-view[^}]*padding-inline:\s*24px/s);
+  assert.match(css, /@media \(max-width: 560px\)[\s\S]*?\.profile-intro h2[^}]*font-size:\s*42px/s);
+  assert.match(css, /\.profile-item a[^}]*min-height:\s*44px/s);
 });

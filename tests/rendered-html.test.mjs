@@ -68,8 +68,8 @@ test("renders the portfolio identity, papers, verified links, and section anchor
   assert.match(html, /Major/);
   assert.match(html, /Selected coursework/);
   assert.match(html, /中文/);
-  assert.match(html, /semantic-figure-manipulation\.(?:png|webp)/);
-  assert.match(html, /detection-guided-attention\.(?:png|webp)/);
-  assert.match(html, /dynamic-freeu\.(?:png|webp)/);
+  assert.match(html, /semantic-figure-pipeline\.png/);
+  assert.match(html, /detection-guided-pipeline\.png/);
+  assert.match(html, /dynamic-freeu-pipeline\.png/);
   assert.doesNotMatch(html, /AutoDraftman|In progress|GPA|3\.01|17784321536/i);
 });
