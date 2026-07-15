@@ -158,7 +158,14 @@ export function PortfolioExperience() {
             </div>
             <div className="hero-visual">
               <span className="visual-label">NEURAL REPRESENTATION / 01</span>
-              <NeuralField />
+              <NeuralField
+                directions={content.interests.map((interest) => ({
+                  id: interest.slug,
+                  label: interest.title,
+                  summary: interest.heroLabel,
+                }))}
+                onSelectResearch={(id) => showRoute("research", id, true)}
+              />
               <span className="visual-caption">Latent space · Attention · Visual reasoning</span>
             </div>
           </section>

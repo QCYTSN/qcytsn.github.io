@@ -112,6 +112,7 @@ export const portfolioContent = {
       {
         slug: "visual-reasoning",
         title: "Computer Vision & Visual Reasoning",
+        heroLabel: "Visual evidence → structured reasoning",
         description: "Recovering structure, relationships, and semantic consistency from complex visual evidence.",
         detailIntro: "Vision becomes useful when a system can move beyond isolated objects and recover the evidence, structure, and relationships inside a scene.",
         detailNote: "Move the scanner across the scene, then select an entity to expose its local evidence graph.",
@@ -125,6 +126,7 @@ export const portfolioContent = {
       {
         slug: "vlm-evaluation",
         title: "Vision-Language Model Evaluation",
+        heroLabel: "Controlled corruption → model failure",
         description: "Designing controlled benchmarks that reveal how multimodal models reason—and where they fail.",
         detailIntro: "A fluent answer is not always a reliable one. Controlled visual perturbations help reveal when multimodal understanding begins to break.",
         detailNote: "Apply visual corruption and watch the answer, confidence, and failure diagnosis change together.",
@@ -138,6 +140,7 @@ export const portfolioContent = {
       {
         slug: "generative-models",
         title: "Controllable Generative Models",
+        heroLabel: "Attention → controllable generation",
         description: "Studying attention, feature modulation, and inference-time control in text-to-image diffusion.",
         detailIntro: "Controllable generation asks how semantic intent, spatial layout, structure, and texture can be adjusted without losing visual coherence.",
         detailNote: "Tune the denoising trajectory, structural guidance, and texture energy inside a compact latent control console.",
@@ -205,6 +208,7 @@ export const portfolioContent = {
       {
         slug: "visual-reasoning",
         title: "计算机视觉与视觉推理",
+        heroLabel: "视觉证据 → 结构化推理",
         description: "从复杂视觉证据中恢复结构、关系与语义一致性。",
         detailIntro: "视觉系统只有从单个目标进一步恢复场景中的证据、结构和关系，才真正具备可用的理解能力。",
         detailNote: "移动扫描镜观察场景，再选择实体以展开对应的局部证据图谱。",
@@ -218,6 +222,7 @@ export const portfolioContent = {
       {
         slug: "vlm-evaluation",
         title: "视觉语言模型评估",
+        heroLabel: "可控扰动 → 模型失效",
         description: "设计可控基准，分析多模态模型如何推理，以及它们在何处失效。",
         detailIntro: "流畅的回答并不一定可靠。通过可控视觉扰动，可以观察多模态理解在什么条件下开始失效。",
         detailNote: "施加视觉扰动，观察答案、置信度和错误诊断如何同时变化。",
@@ -231,6 +236,7 @@ export const portfolioContent = {
       {
         slug: "generative-models",
         title: "可控生成模型",
+        heroLabel: "注意力 → 可控生成",
         description: "研究文本生成图像扩散模型中的注意力、特征调制与推理时控制。",
         detailIntro: "可控生成关注如何调节语义意图、空间布局、结构与纹理，同时保持最终图像的视觉一致性。",
         detailNote: "在潜空间控制台中调节去噪过程、结构引导和纹理能量。",

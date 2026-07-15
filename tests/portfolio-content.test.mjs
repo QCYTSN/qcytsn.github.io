@@ -210,8 +210,8 @@ test("project covers use smaller WebP assets and language changes update the doc
 
 test("the hero uses a dimensional AI neural field instead of a rotating poster", () => {
   assert.match(experience, /import \{ NeuralField \} from "\.\/NeuralField"/);
-  assert.match(experience, /<NeuralField \/>/);
-  assert.match(neuralField, /className="neural-field"/);
+  assert.match(experience, /<NeuralField/);
+  assert.match(neuralField, /className=\{`neural-field/);
   assert.match(neuralField, /onPointerMove/);
   assert.match(neuralField, /--pointer-x/);
   assert.match(neuralField, /neural-layer/);
@@ -287,4 +287,21 @@ test("view navigation uses one restrained motion system", () => {
   assert.match(css, /--motion-view:\s*360ms/);
   assert.match(css, /\.view-panel\.is-active[^}]*var\(--motion-view\)/s);
   assert.match(css, /\.nav-active-marker[^}]*transition:/s);
+});
+
+test("the Neural Field exposes three semantic research destinations", () => {
+  assert.match(neuralField, /export type NeuralDirection/);
+  assert.match(neuralField, /directions:\s*readonly NeuralDirection\[\]/);
+  assert.match(neuralField, /onSelectResearch:\s*\(id:\s*ResearchId\)\s*=>\s*void/);
+  assert.match(neuralField, /className="neural-direction"/);
+  assert.match(neuralField, /aria-pressed=/);
+  assert.match(neuralField, /activeDirection/);
+  assert.match(neuralField, /matchMedia\("\(hover: none\)"\)/);
+  assert.match(neuralField, /event\.pointerType === "touch"/);
+  assert.doesNotMatch(neuralField, /className={`neural-field[^>]*aria-hidden="true"/);
+  assert.doesNotMatch(neuralField, /onKeyDown=/);
+  assert.match(experience, /<NeuralField[\s\S]*?directions=/);
+  assert.match(experience, /onSelectResearch=/);
+  assert.match(css, /\.neural-direction/);
+  assert.match(css, /\.neural-field\.has-active-direction/);
 });
