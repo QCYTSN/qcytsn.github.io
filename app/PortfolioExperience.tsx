@@ -15,6 +15,8 @@ const researchHashes: Record<ResearchId, string> = {
   "vlm-evaluation": "#research/vlm-evaluation",
   "generative-models": "#research/generative-models",
 };
+const VIEW_COVER_MS = 180;
+const VIEW_RELEASE_MS = 40;
 const Arrow = ({ diagonal = false }: { diagonal?: boolean }) => <span aria-hidden="true">{diagonal ? "↗" : "→"}</span>;
 
 function routeFromHash(hash: string): { view: ViewId; research: ResearchId | null } {
@@ -51,10 +53,12 @@ export function PortfolioExperience() {
     window.setTimeout(() => {
       setActiveView(next);
       setActiveResearch(next === "research" ? research : null);
-      if (updateHistory) window.history.pushState(null, "", research ? researchHashes[research] : `#${next}`);
+      if (updateHistory) {
+        window.history.pushState(null, "", research ? researchHashes[research] : `#${next}`);
+      }
       window.scrollTo({ top: 0, behavior: "instant" });
-      window.setTimeout(() => setTransitioning(false), 60);
-    }, 260);
+      window.setTimeout(() => setTransitioning(false), VIEW_RELEASE_MS);
+    }, VIEW_COVER_MS);
   }, [activeResearch, activeView]);
 
   const showView = useCallback((next: ViewId, updateHistory: boolean) => {
@@ -118,6 +122,11 @@ export function PortfolioExperience() {
         <nav className="view-navigation" aria-label={content.navigationLabel}>
           <span className="nav-caption">INDEX / 04</span>
           <div>
+            <i
+              className="nav-active-marker"
+              aria-hidden="true"
+              style={{ "--nav-index": viewIds.indexOf(activeView) } as React.CSSProperties}
+            />
             {content.navigation.map((item, index) => {
               const view = item.href.slice(1) as ViewId;
               return (

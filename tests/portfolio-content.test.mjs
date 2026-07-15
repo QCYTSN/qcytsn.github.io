@@ -276,3 +276,15 @@ test("the public FreeU paper copy excludes student IDs and the coauthor email", 
   const extracted = execFileSync("pdftotext", [pdfPath, "-"], { encoding: "utf8" });
   assert.doesNotMatch(extracted, /2330034007|2330034079|t330034007@uic\.edu\.cn|t330034079@uic\.edu\.cn/);
 });
+
+test("view navigation uses one restrained motion system", () => {
+  assert.match(experience, /const VIEW_COVER_MS = 180/);
+  assert.match(experience, /const VIEW_RELEASE_MS = 40/);
+  assert.match(experience, /className="nav-active-marker"/);
+  assert.match(experience, /--nav-index/);
+  assert.match(css, /--motion-fast:\s*180ms/);
+  assert.match(css, /--motion-state:\s*320ms/);
+  assert.match(css, /--motion-view:\s*360ms/);
+  assert.match(css, /\.view-panel\.is-active[^}]*var\(--motion-view\)/s);
+  assert.match(css, /\.nav-active-marker[^}]*transition:/s);
+});
