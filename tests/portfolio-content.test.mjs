@@ -264,6 +264,27 @@ test("research demos use deliberate controls and readable derived states", () =>
   assert.match(css, /--edge-clarity/);
 });
 
+test("research demo refinements preserve readable copy, touch scrolling, and independent motion channels", () => {
+  assert.match(researchDemos, /uncertain: "视觉证据正在减弱"/);
+  assert.match(researchDemos, /reset: "重置"/);
+  assert.match(css, /\.evidence-canvas\s*\{[^}]*touch-action:\s*pan-y/s);
+  assert.match(researchDemos, /\{failed \? labels\.wrong : labels\.correct\}/);
+  assert.match(researchDemos, /"--denoise": denoising \/ 100/);
+  assert.match(researchDemos, /"--structure": structure \/ 100/);
+  assert.match(researchDemos, /"--texture": texture \/ 100/);
+  assert.match(researchDemos, /"--attribute-offset": `\$\{\(50 - structure\) \* \.18\}px`/);
+  assert.match(researchDemos, /"--edge-clarity": `\$\{Math\.max\(0, 1\.6 - texture \* \.016\)\}px`/);
+  assert.match(css, /\.noise-field\s*\{[^}]*opacity:\s*calc\(1 - var\(--denoise\)\)[^}]*transition:\s*opacity var\(--motion-state\) ease/s);
+  assert.match(css, /\.spatial-box\s*\{[^}]*var\(--structure\)[^}]*transition:\s*width var\(--motion-state\) var\(--ease-state\)/s);
+  assert.match(css, /\.attention-heat\s*\{[^}]*var\(--structure\)[^}]*transition:\s*opacity var\(--motion-state\) ease/s);
+  assert.match(css, /\.generated-portrait\s*\{[^}]*var\(--edge-clarity\)[^}]*transition:\s*transform var\(--motion-state\) var\(--ease-out\), filter var\(--motion-state\) var\(--ease-state\)/s);
+  assert.match(css, /\.spectrum i\s*\{[^}]*var\(--texture\)[^}]*transition:\s*height var\(--motion-state\) var\(--ease-state\), opacity var\(--motion-fast\) ease/s);
+  assert.match(css, /\.attribute-shape\s*\{[^}]*transition:\s*translate var\(--motion-state\) var\(--ease-out\)/s);
+  assert.doesNotMatch(css, /\.attribute-shape\s*\{[^}]*transition:\s*all/s);
+  assert.match(css, /@media \(max-width: 560px\)[\s\S]*?\.entity-selector button, \.corruption-selector button, \.prompt-panel button, \.demo-reset, \.research-back\s*\{\s*min-height:\s*44px;/);
+  assert.match(css, /@media \(max-width: 560px\)[\s\S]*?\.robustness-controls input, \.generation-controls input\s*\{\s*height:\s*44px;/);
+});
+
 test("each research demo has a collapsed bilingual explanation guide", () => {
   assert.match(content, /How to read this demo/);
   assert.match(content, /如何理解这个演示/);
