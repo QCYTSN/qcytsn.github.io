@@ -57,8 +57,8 @@ export function NeuralField({ directions, onSelectResearch }: NeuralFieldProps) 
   };
 
   const activateDirection = (index: number) => {
-    const touchOnly = window.matchMedia("(hover: none)").matches;
-    if (touchOnly && activeDirection !== index) {
+    const touchActivation = touchPointerDirection.current === index;
+    if (touchActivation && activeDirection !== index) {
       setActiveDirection(index);
       return;
     }

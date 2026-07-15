@@ -290,6 +290,7 @@ test("view navigation uses one restrained motion system", () => {
 });
 
 test("the Neural Field exposes three semantic research destinations", () => {
+  const activateDirection = neuralField.match(/const activateDirection = \(index: number\) => \{[\s\S]*?\n  \};/)?.[0] ?? "";
   assert.match(neuralField, /export type NeuralDirection/);
   assert.match(neuralField, /directions:\s*readonly NeuralDirection\[\]/);
   assert.match(neuralField, /onSelectResearch:\s*\(id:\s*ResearchId\)\s*=>\s*void/);
@@ -304,6 +305,8 @@ test("the Neural Field exposes three semantic research destinations", () => {
   assert.match(neuralField, /onFocus=\{\(\) => \{[\s\S]*?touchPointerDirection\.current !== index/);
   assert.match(neuralField, /onPointerCancel=\{\(\) => \{[\s\S]*?touchPointerDirection\.current = null/);
   assert.match(neuralField, /onClick=\{\(\) => \{[\s\S]*?activateDirection\(index\)[\s\S]*?touchPointerDirection\.current = null/);
+  assert.match(neuralField, /const activateDirection = \(index: number\) => \{[\s\S]*?touchPointerDirection\.current === index/);
+  assert.doesNotMatch(activateDirection, /matchMedia/);
   assert.doesNotMatch(neuralField, /className={`neural-field[^>]*aria-hidden="true"/);
   assert.doesNotMatch(neuralField, /onKeyDown=/);
   assert.match(experience, /<NeuralField[\s\S]*?directions=/);
