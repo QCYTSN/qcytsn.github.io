@@ -547,6 +547,7 @@ h1 { max-width: 760px; margin-bottom: 0; font-size: clamp(54px, 5vw, 84px); line
 @media (max-width: 560px) {
   :root { --gutter: 17px; }
   .profile-view { padding-inline: 24px; }
+  .language-toggle { min-width: 44px; min-height: 44px; justify-content: center; }
   .wordmark > span:last-child { font-size: 19px; }
   .view-navigation a { display: flex; justify-content: center; }
   .view-navigation a > span { display: none; }

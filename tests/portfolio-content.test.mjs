@@ -47,6 +47,8 @@ test("the site uses the selected FG identity across browser icon formats", () =>
   assert.match(layout, /favicon-32x32\.png/);
   assert.match(layout, /favicon\.ico/);
   assert.match(layout, /apple-touch-icon\.png/);
+  assert.match(layout, /<link rel="icon" href="\/favicon\.svg"/);
+  assert.match(layout, /<link rel="apple-touch-icon" href="\/apple-touch-icon\.png"/);
 
   for (const assetPath of [faviconSvgPath, faviconPngPath, faviconIcoPath, appleTouchIconPath]) {
     assert.equal(existsSync(assetPath), true, `${fileURLToPath(assetPath)} should exist`);
@@ -377,4 +379,5 @@ test("project figures and mobile profile use the approved polished presentation"
   assert.match(css, /@media \(max-width: 560px\)[\s\S]*?\.profile-view[^}]*padding-inline:\s*24px/s);
   assert.match(css, /@media \(max-width: 560px\)[\s\S]*?\.profile-intro h2[^}]*font-size:\s*42px/s);
   assert.match(css, /\.profile-item a[^}]*min-height:\s*44px/s);
+  assert.match(css, /@media \(max-width: 560px\)[\s\S]*?\.language-toggle\s*\{[^}]*min-width:\s*44px;[^}]*min-height:\s*44px;/s);
 });
