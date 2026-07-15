@@ -298,6 +298,12 @@ test("the Neural Field exposes three semantic research destinations", () => {
   assert.match(neuralField, /activeDirection/);
   assert.match(neuralField, /matchMedia\("\(hover: none\)"\)/);
   assert.match(neuralField, /event\.pointerType === "touch"/);
+  assert.match(neuralField, /touchPointerDirection\s*=\s*useRef<number \| null>\(null\)/);
+  assert.match(neuralField, /onPointerEnter=\{\(event\) => \{[\s\S]*?event\.pointerType !== "touch"/);
+  assert.match(neuralField, /onPointerDown=\{\(event\) => \{[\s\S]*?event\.pointerType === "touch"[\s\S]*?touchPointerDirection\.current = index/);
+  assert.match(neuralField, /onFocus=\{\(\) => \{[\s\S]*?touchPointerDirection\.current !== index/);
+  assert.match(neuralField, /onPointerCancel=\{\(\) => \{[\s\S]*?touchPointerDirection\.current = null/);
+  assert.match(neuralField, /onClick=\{\(\) => \{[\s\S]*?activateDirection\(index\)[\s\S]*?touchPointerDirection\.current = null/);
   assert.doesNotMatch(neuralField, /className={`neural-field[^>]*aria-hidden="true"/);
   assert.doesNotMatch(neuralField, /onKeyDown=/);
   assert.match(experience, /<NeuralField[\s\S]*?directions=/);

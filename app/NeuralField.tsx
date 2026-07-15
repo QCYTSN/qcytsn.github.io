@@ -36,6 +36,7 @@ const edges = [
 
 export function NeuralField({ directions, onSelectResearch }: NeuralFieldProps) {
   const fieldRef = useRef<HTMLDivElement>(null);
+  const touchPointerDirection = useRef<number | null>(null);
   const [activeDirection, setActiveDirection] = useState<number | null>(null);
 
   const onPointerMove = (event: PointerEvent<HTMLDivElement>) => {
@@ -147,9 +148,22 @@ export function NeuralField({ directions, onSelectResearch }: NeuralFieldProps) 
             type="button"
             aria-pressed={activeDirection === index}
             style={{ left: `${directionAnchors[index].x}%`, top: `${directionAnchors[index].y}%` }}
-            onPointerEnter={() => setActiveDirection(index)}
-            onFocus={() => setActiveDirection(index)}
-            onClick={() => activateDirection(index)}
+            onPointerEnter={(event) => {
+              if (event.pointerType !== "touch") setActiveDirection(index);
+            }}
+            onPointerDown={(event) => {
+              if (event.pointerType === "touch") touchPointerDirection.current = index;
+            }}
+            onPointerCancel={() => {
+              touchPointerDirection.current = null;
+            }}
+            onFocus={() => {
+              if (touchPointerDirection.current !== index) setActiveDirection(index);
+            }}
+            onClick={() => {
+              activateDirection(index);
+              touchPointerDirection.current = null;
+            }}
           >
             <i aria-hidden="true" />
             <span>{direction.label}</span>
