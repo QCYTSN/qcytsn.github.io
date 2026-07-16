@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState, type MouseEvent } from "react";
-import { NeuralField } from "./NeuralField";
+import { ResearchAtlas } from "./ResearchAtlas";
 import { ResearchDemo, type ResearchId } from "./ResearchDemos";
 import { portfolioContent, type Language } from "./content";
 
@@ -196,31 +196,12 @@ export function PortfolioExperience() {
 
         <div className="view-stage">
           <section className={`view-panel home-view ${activeView === "home" ? "is-active" : ""}`} id="home" aria-hidden={activeView !== "home"}>
-            <div className="hero-copy">
-              <p className="eyebrow">{content.eyebrow}</p>
-              <h1>{content.headline}</h1>
-              <p className="hero-description">{content.description}</p>
-              <div className="hero-actions">
-                <a className="button button-primary" href="#projects" onClick={navigate("projects")}>{content.primaryAction}<Arrow /></a>
-                <a className="text-link" href="#profile" onClick={navigate("profile")}>{content.secondaryAction}<Arrow /></a>
-              </div>
-              <div className="hero-footnote">
-                <div className="project-signal"><i aria-hidden="true" />{content.signal}</div>
-                <span className="interaction-hint">MOVE TO EXPLORE / 3D FIELD</span>
-              </div>
-            </div>
-            <div className="hero-visual">
-              <span className="visual-label">NEURAL REPRESENTATION / 01</span>
-              <NeuralField
-                directions={content.interests.map((interest) => ({
-                  id: interest.slug,
-                  label: interest.title,
-                  summary: interest.heroLabel,
-                }))}
-                onSelectResearch={(id) => showRoute("research", id, true)}
-              />
-              <span className="visual-caption">Latent space · Attention · Visual reasoning</span>
-            </div>
+            <ResearchAtlas
+              language={language}
+              onResearchIndex={navigate("research")}
+              onProfile={navigate("profile")}
+              onOpenResearch={openResearch}
+            />
           </section>
 
           <section className={`view-panel projects-view ${activeView === "projects" ? "is-active" : ""}`} id="projects" aria-hidden={activeView !== "projects"}>

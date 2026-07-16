@@ -7,7 +7,7 @@ import test from "node:test";
 const pagePath = new URL("../app/page.tsx", import.meta.url);
 const contentPath = new URL("../app/content.ts", import.meta.url);
 const cssPath = new URL("../app/globals.css", import.meta.url);
-const neuralFieldPath = new URL("../app/NeuralField.tsx", import.meta.url);
+const researchAtlasPath = new URL("../app/ResearchAtlas.tsx", import.meta.url);
 const experiencePath = new URL("../app/PortfolioExperience.tsx", import.meta.url);
 const researchDemosPath = new URL("../app/ResearchDemos.tsx", import.meta.url);
 const layoutPath = new URL("../app/layout.tsx", import.meta.url);
@@ -24,12 +24,15 @@ const faviconSvgPath = new URL("../public/favicon.svg", import.meta.url);
 const faviconPngPath = new URL("../public/favicon-32x32.png", import.meta.url);
 const faviconIcoPath = new URL("../public/favicon.ico", import.meta.url);
 const appleTouchIconPath = new URL("../public/apple-touch-icon.png", import.meta.url);
+const fgMarkSvgPath = new URL("../public/fg-mark-v3.svg", import.meta.url);
+const fgMarkPngPath = new URL("../public/fg-mark-32-v3.png", import.meta.url);
+const fgMarkTouchPath = new URL("../public/fg-mark-touch-v3.png", import.meta.url);
 const pagesWorkflowPath = new URL("../.github/workflows/deploy-pages.yml", import.meta.url);
 const readmePath = new URL("../README.md", import.meta.url);
 const page = readFileSync(pagePath, "utf8");
 const content = existsSync(contentPath) ? readFileSync(contentPath, "utf8") : "";
 const css = readFileSync(cssPath, "utf8");
-const neuralField = existsSync(neuralFieldPath) ? readFileSync(neuralFieldPath, "utf8") : "";
+const researchAtlas = existsSync(researchAtlasPath) ? readFileSync(researchAtlasPath, "utf8") : "";
 const experience = existsSync(experiencePath) ? readFileSync(experiencePath, "utf8") : "";
 const researchDemos = existsSync(researchDemosPath) ? readFileSync(researchDemosPath, "utf8") : "";
 const layout = existsSync(layoutPath) ? readFileSync(layoutPath, "utf8") : "";
@@ -43,14 +46,13 @@ const pagesWorkflow = existsSync(pagesWorkflowPath) ? readFileSync(pagesWorkflow
 const readme = readFileSync(readmePath, "utf8");
 
 test("the site uses the selected FG identity across browser icon formats", () => {
-  assert.match(layout, /favicon\.svg/);
-  assert.match(layout, /favicon-32x32\.png/);
-  assert.match(layout, /favicon\.ico/);
-  assert.match(layout, /apple-touch-icon\.png/);
-  assert.match(layout, /<link rel="icon" href="\/favicon\.svg"/);
-  assert.match(layout, /<link rel="apple-touch-icon" href="\/apple-touch-icon\.png"/);
+  assert.match(layout, /fg-mark-v3\.svg/);
+  assert.match(layout, /fg-mark-32-v3\.png/);
+  assert.match(layout, /fg-mark-touch-v3\.png/);
+  assert.match(layout, /icons:\s*\{/);
+  assert.doesNotMatch(layout, /shortcut icon[^\n]*favicon\.ico/);
 
-  for (const assetPath of [faviconSvgPath, faviconPngPath, faviconIcoPath, appleTouchIconPath]) {
+  for (const assetPath of [faviconSvgPath, faviconPngPath, faviconIcoPath, appleTouchIconPath, fgMarkSvgPath, fgMarkPngPath, fgMarkTouchPath]) {
     assert.equal(existsSync(assetPath), true, `${fileURLToPath(assetPath)} should exist`);
     assert.ok(statSync(assetPath).size > 0, `${fileURLToPath(assetPath)} should not be empty`);
   }
@@ -114,10 +116,12 @@ test("the profile uses verified contact and education details without excluded c
 });
 
 test("primary navigation and calls to action use real view anchors", () => {
-  assert.match(experience, /href=[\"']#projects/);
+  assert.match(content, /href: [\"']#projects[\"']/);
   assert.match(content, /href: [\"']#research[\"']/);
   assert.match(experience, /content\.navigation\.map/);
   assert.match(content, /href: [\"']#profile[\"']/);
+  assert.match(researchAtlas, /href="#research"/);
+  assert.match(researchAtlas, /href="#profile"/);
 });
 
 test("the full-screen experience includes contact, language, loading, and view transition controls", () => {
@@ -213,16 +217,20 @@ test("project covers preserve fallback WebPs, use pipeline assets, and update do
   assert.match(experience, /language === "zh" \? "zh-CN" : "en"/);
 });
 
-test("the hero uses a dimensional AI neural field instead of a rotating poster", () => {
-  assert.match(experience, /import \{ NeuralField \} from "\.\/NeuralField"/);
-  assert.match(experience, /<NeuralField/);
-  assert.match(neuralField, /className=\{`neural-field/);
-  assert.match(neuralField, /onPointerMove/);
-  assert.match(neuralField, /--pointer-x/);
-  assert.match(neuralField, /neural-layer/);
-  assert.match(neuralField, /signal-path/);
-  assert.match(css, /perspective:/);
-  assert.doesNotMatch(experience, /FolioIllustration/);
+test("the hero uses a research-direction atlas with current scholarly context", () => {
+  assert.match(experience, /import \{ ResearchAtlas \} from "\.\/ResearchAtlas"/);
+  assert.match(experience, /<ResearchAtlas/);
+  for (const asset of ["visual-reasoning.png", "vlm-evaluation.png", "generative-models.png"]) {
+    assert.equal(existsSync(new URL(`../public/images/research/${asset}`, import.meta.url)), true);
+    assert.match(researchAtlas, new RegExp(asset.replace(".", "\\.")));
+  }
+  assert.match(researchAtlas, /Visual Instruction Tuning\. NeurIPS 2023/);
+  assert.match(researchAtlas, /MMMU:[\s\S]*CVPR 2024/);
+  assert.match(researchAtlas, /Scaling Rectified Flow Transformers[\s\S]*ICML 2024/);
+  assert.match(css, /\.atlas-trajectory/);
+  assert.match(css, /\.atlas-directions/);
+  assert.doesNotMatch(experience, /OpticalArchive/);
+  assert.doesNotMatch(experience, /<NeuralField/);
 });
 
 test("research directions open three nested conceptual demo pages", () => {
@@ -269,10 +277,10 @@ test("research demos use deliberate controls and readable derived states", () =>
   assert.match(css, /--edge-clarity/);
 });
 
-test("research demo refinements preserve readable copy, touch scrolling, and independent motion channels", () => {
+test("research demo refinements preserve readable copy, drag isolation, and independent motion channels", () => {
   assert.match(researchDemos, /uncertain: "视觉证据正在减弱"/);
   assert.match(researchDemos, /reset: "重置"/);
-  assert.match(css, /\.evidence-canvas\s*\{[^}]*touch-action:\s*pan-y/s);
+  assert.match(css, /\.evidence-canvas\s*\{[^}]*user-select:\s*none[^}]*touch-action:\s*none/s);
   assert.match(researchDemos, /\{failed \? labels\.wrong : labels\.correct\}/);
   assert.match(researchDemos, /"--denoise": denoising \/ 100/);
   assert.match(researchDemos, /"--structure": structure \/ 100/);
@@ -378,30 +386,37 @@ test("mobile interactive targets use a restrained 44 pixel contract", () => {
   assert.match(mobile, /\.prompt-token-selector button[^}]*min-height:\s*44px/);
 });
 
-test("the Neural Field exposes three semantic research destinations", () => {
-  const activateDirection = neuralField.match(/const activateDirection = \(index: number\) => \{[\s\S]*?\n  \};/)?.[0] ?? "";
-  assert.match(neuralField, /export type NeuralDirection/);
-  assert.match(neuralField, /directions:\s*readonly NeuralDirection\[\]/);
-  assert.match(neuralField, /onSelectResearch:\s*\(id:\s*ResearchId\)\s*=>\s*void/);
-  assert.match(neuralField, /className="neural-direction"/);
-  assert.match(neuralField, /aria-pressed=/);
-  assert.match(neuralField, /activeDirection/);
-  assert.match(neuralField, /matchMedia\("\(hover: none\)"\)/);
-  assert.match(neuralField, /event\.pointerType === "touch"/);
-  assert.match(neuralField, /touchPointerDirection\s*=\s*useRef<number \| null>\(null\)/);
-  assert.match(neuralField, /onPointerEnter=\{\(event\) => \{[\s\S]*?event\.pointerType !== "touch"/);
-  assert.match(neuralField, /onPointerDown=\{\(event\) => \{[\s\S]*?event\.pointerType === "touch"[\s\S]*?touchPointerDirection\.current = index/);
-  assert.match(neuralField, /onFocus=\{\(\) => \{[\s\S]*?touchPointerDirection\.current !== index/);
-  assert.match(neuralField, /onPointerCancel=\{\(\) => \{[\s\S]*?touchPointerDirection\.current = null/);
-  assert.match(neuralField, /onClick=\{\(\) => \{[\s\S]*?activateDirection\(index\)[\s\S]*?touchPointerDirection\.current = null/);
-  assert.match(neuralField, /const activateDirection = \(index: number\) => \{[\s\S]*?touchPointerDirection\.current === index/);
-  assert.doesNotMatch(activateDirection, /matchMedia/);
-  assert.doesNotMatch(neuralField, /className={`neural-field[^>]*aria-hidden="true"/);
-  assert.doesNotMatch(neuralField, /onKeyDown=/);
-  assert.match(experience, /<NeuralField[\s\S]*?directions=/);
-  assert.match(experience, /onSelectResearch=/);
-  assert.match(css, /\.neural-direction/);
-  assert.match(css, /\.neural-field\.has-active-direction/);
+test("the Research Atlas stays direction-focused and leaves room for more projects", () => {
+  assert.match(researchAtlas, /How machines see—and how we can make their vision more reliable\./);
+  assert.doesNotMatch(researchAtlas, /I study how machines see/);
+  assert.match(researchAtlas, /Explore research directions/);
+  assert.match(researchAtlas, /Understand[\s\S]*Evaluate[\s\S]*Control/);
+  assert.match(researchAtlas, /2023—2026/);
+  assert.match(researchAtlas, /<small>\{copy\.affiliation\}<\/small>BNBU/);
+  assert.doesNotMatch(researchAtlas, /selected projects|BNBU Vision Lab|Featured Work/i);
+  assert.match(css, /\.paper-grid:has\(\.paper-card:nth-child\(4\)\)/);
+});
+
+test("only the selected portfolio view is displayed", () => {
+  assert.match(css, /\.view-panel\s*\{[^}]*display:\s*none/s);
+  assert.match(css, /\.view-panel\.is-active\s*\{[^}]*display:\s*block/s);
+  assert.match(css, /\.home-view\.is-active\s*\{[^}]*display:\s*block/s);
+  assert.doesNotMatch(css, /\.home-view\s*,\s*\.home-view\.is-active\s*\{[^}]*display:\s*block/s);
+});
+
+test("the editorial typography keeps titles, body copy, and labels distinct", () => {
+  assert.match(css, /@font-face\s*\{[^}]*font-family:\s*"De Aetna"[^}]*DeAetna-Text\.otf/s);
+  assert.match(css, /h1, h2, h3\s*\{[^}]*"Newsreader"/s);
+  assert.match(css, /body\s*\{[^}]*font-family:\s*"De Aetna"/s);
+  assert.match(css, /\.atlas-trajectory[^}]*"Courier New"/s);
+});
+
+test("the Research Atlas prevents desktop title collisions and scales to five directions", () => {
+  assert.match(researchAtlas, /headlineLines:\s*\["How machines see—", "and how we can make", "their vision more reliable\."\]/);
+  assert.match(css, /@media \(max-width: 1450px\) and \(min-width: 821px\)[\s\S]*?\.atlas-title > span\s*\{\s*white-space:\s*normal/s);
+  assert.match(css, /\.atlas-directions:has\(\.atlas-direction:nth-child\(4\):last-child\)[^}]*repeat\(2/s);
+  assert.match(css, /\.atlas-directions:has\(\.atlas-direction:nth-child\(5\)\)[^}]*repeat\(6/s);
+  assert.match(css, /\.atlas-citation[^}]*clamp\(11\.5px/s);
 });
 
 test("project figures and mobile profile use the approved polished presentation", () => {

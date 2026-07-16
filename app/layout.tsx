@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import "@fontsource/newsreader/400.css";
+import "@fontsource/newsreader/400-italic.css";
 import "./globals.css";
 import { SITE_ORIGIN } from "./site-origin";
 
@@ -37,6 +39,14 @@ export const metadata: Metadata = {
     description:
       "Computer vision, vision-language model evaluation, and controllable generative model projects.",
   },
+  icons: {
+    icon: [
+      { url: "/fg-mark-v3.svg", type: "image/svg+xml" },
+      { url: "/fg-mark-32-v3.png", type: "image/png", sizes: "32x32" },
+    ],
+    shortcut: "/fg-mark-v3.svg",
+    apple: [{ url: "/fg-mark-touch-v3.png", type: "image/png", sizes: "180x180" }],
+  },
   other: {
     "codex-preview": "development",
   },
@@ -45,13 +55,6 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <head>
-        <link rel="shortcut icon" href="/favicon.ico" />
-        <link rel="icon" href="/favicon.ico" sizes="any" />
-        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-        <link rel="icon" href="/favicon-32x32.png" sizes="32x32" type="image/png" />
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" type="image/png" />
-      </head>
       <body>{children}</body>
     </html>
   );

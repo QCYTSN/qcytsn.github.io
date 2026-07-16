@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="FG">
+  <rect width="64" height="64" rx="4" fill="#151918"/>
+  <rect x="3" y="3" width="58" height="58" rx="2" fill="none" stroke="#f2eddf" stroke-opacity=".22"/>
+  <text x="32" y="40" fill="#faf7ef" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="500" letter-spacing="-1" text-anchor="middle">FG</text>
+</svg>
