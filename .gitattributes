@@ -1,0 +1,17 @@
+# Keep source files consistent across Windows, macOS, and Linux.
+* text=auto eol=lf
+
+# Preserve Windows command scripts when one is added.
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Binary assets.
+*.ico binary
+*.otf binary
+*.pdf binary
+*.png binary
+*.webp binary
+
+# Keep generated files from distorting GitHub language statistics.
+package-lock.json linguist-generated=true
+worker-configuration.d.ts linguist-generated=true

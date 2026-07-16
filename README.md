@@ -1,120 +1,102 @@
-# Fengkai Gao — AI Research Portfolio
+<div align="center">
+  <a href="https://qcytsn.github.io">
+    <img src="./public/fg-mark-v3.svg" width="72" alt="Fengkai Gao portfolio mark" />
+  </a>
+  <h1>Fengkai Gao · AI Research Portfolio</h1>
+  <p><strong>Computer vision, vision-language model evaluation, and controllable generative models.</strong></p>
+  <p>
+    <a href="https://qcytsn.github.io">Live portfolio</a> ·
+    <a href="https://peanut-ai.dev">Primary site</a> ·
+    <a href="https://github.com/QCYTSN">GitHub profile</a>
+  </p>
+  <p>
+    <a href="https://github.com/QCYTSN/qcytsn.github.io/actions/workflows/deploy-pages.yml"><img src="https://img.shields.io/github/actions/workflow/status/QCYTSN/qcytsn.github.io/deploy-pages.yml?branch=main&amp;label=GitHub%20Pages&amp;style=flat-square" alt="GitHub Pages status" /></a>
+    <img src="https://img.shields.io/badge/Next.js-16-111111?style=flat-square&amp;logo=nextdotjs&amp;logoColor=white" alt="Next.js 16" />
+    <img src="https://img.shields.io/badge/TypeScript-5-3178C6?style=flat-square&amp;logo=typescript&amp;logoColor=white" alt="TypeScript 5" />
+    <img src="https://img.shields.io/badge/Cloudflare-Worker-F38020?style=flat-square&amp;logo=cloudflare&amp;logoColor=white" alt="Cloudflare Worker" />
+  </p>
+</div>
 
-Public portfolio with two deployment targets:
+<a href="https://qcytsn.github.io">
+  <img src="./public/images/hero/optical-specimen-premium-composite.png" alt="Optical specimen artwork from the portfolio" />
+</a>
 
-- Primary Sites deployment: [https://peanut-ai.dev](https://peanut-ai.dev)
-- Free GitHub Pages deployment: [https://qcytsn.github.io](https://qcytsn.github.io)
+## About
 
-Both targets use the same source. `npm run build` creates the Vinext/Worker
-artifact for Sites. `npm run build:pages` creates a fully static `out/`
-directory for GitHub Pages. Pushes to `main` in the `qcytsn.github.io`
-repository deploy the static build automatically through GitHub Actions.
+This repository contains my bilingual, interactive research portfolio. It presents selected work in scientific-figure integrity, controllable image generation, and diffusion-model analysis, alongside small interactive demonstrations of the ideas behind the research.
 
-## Implementation Base
+The experience is available in English and Chinese and is designed to make research outcomes, methods, and model behavior easy to explore.
 
-A clean full-stack starter running on
-[vinext](https://github.com/cloudflare/vinext), with optional Cloudflare D1 and
-Drizzle support.
+## Selected work
 
-## Prerequisites
+| Project | Focus | Resources |
+| --- | --- | --- |
+| Semantic Manipulation in Academic Figures | Benchmark design, VLM evaluation, structured visual reasoning | [Report](./public/papers/semantic-figure-manipulation.pdf) · [Code](https://github.com/QCYTSN/DSMAF_Light) |
+| Detection-Guided Attention Control | Training-free control, cross-attention, concept disentanglement | [Report](./public/papers/detection-guided-attention.pdf) · [Code](https://github.com/QCYTSN/Training-Free-Concept-Disentanglement-in-T2I-Generation-via-Detection-Guided-Attention-Control) |
+| Dynamic FreeU | Frequency analysis, U-Net features, dynamic modulation | [Report](./public/papers/dynamic-freeu.pdf) |
 
-- Node.js `>=22.13.0`
-- Linux with `flock`, `curl`, and GNU `timeout`
+## Portfolio features
 
-## Sites Lifecycle
+- Bilingual English and Chinese content
+- Interactive research demos for visual reasoning, VLM evaluation, and generative models
+- Responsive layouts, motion controls, and keyboard-friendly interactions
+- Project reports and code links collected in one place
+- Automatic deployment to GitHub Pages from `main`
 
-The Sites lifecycle CLI runs the locked dependency install before returning this checkout. Edit the source under `app/`, then checkpoint when a coherent milestone is ready to inspect or share. The remote Sites builder runs `npm run build` against the pushed commit. Do not repeat install or build as a normal pre-checkpoint step.
+## Built with
 
-This starter does not use `wrangler.jsonc`.
+- [Next.js 16](https://nextjs.org/) and [React 19](https://react.dev/)
+- [TypeScript](https://www.typescriptlang.org/) and [Tailwind CSS 4](https://tailwindcss.com/)
+- [Vinext](https://github.com/cloudflare/vinext), [Vite](https://vite.dev/), and [Cloudflare Workers](https://workers.cloudflare.com/)
+- Optional [Cloudflare D1](https://developers.cloudflare.com/d1/) and [Drizzle ORM](https://orm.drizzle.team/) integration
 
-`install:ci` is intentionally a single, non-retrying `npm ci`. It refuses a concurrent install for the same project, consumes a matching image-seeded npm cache with `--prefer-offline` while retaining registry fallback for a missing cache object, otherwise downloads and verifies the complete vinext tarball recorded in `package-lock.json`, limits npm to one socket, and terminates a stalled install. `build` applies a short timeout and then validates the Sites artifact. These helpers target Linux and use GNU `timeout`; they are not native macOS scripts.
+## Run locally
 
-Scripts that need writable project-scoped home, npm, XDG, and temporary paths use `scripts/sites-env.sh`. The `dev` and `start` scripts honor the caller's runtime environment and keep Wrangler logs inside the checkout. The generated `.sites-runtime/` directory is disposable and ignored by Git.
+Requirements: Node.js `>=22.13.0` and a Bash-compatible environment such as Linux, macOS, Git Bash, or WSL.
 
-## Included Shape
-
-- edit site code under `app/`
-- `app/chatgpt-auth.ts` provides optional dispatch-owned ChatGPT sign-in helpers
-- `.openai/hosting.json` declares optional Sites D1 and R2 bindings
-- `vite.config.ts` simulates declared bindings for local development
-- `db/index.ts` reads the D1 binding from the Cloudflare Worker environment
-- `db/schema.ts` starts intentionally empty
-- `examples/d1/` contains an optional D1 example surface
-- `drizzle.config.ts` supports local migration generation when needed
-
-## Workspace Auth Headers
-
-OpenAI workspace sites can read the current user's email from
-`oai-authenticated-user-email`.
-
-SIWC-authenticated workspace sites may also receive
-`oai-authenticated-user-full-name` when the user's SIWC profile has a non-empty
-`name` claim. The full-name value is percent-encoded UTF-8 and is accompanied by
-`oai-authenticated-user-full-name-encoding: percent-encoded-utf-8`.
-
-Treat the full name as optional and fall back to email when it is absent:
-
-```tsx
-import { headers } from "next/headers";
-
-export default async function Home() {
-  const requestHeaders = await headers();
-  const email = requestHeaders.get("oai-authenticated-user-email");
-  const encodedFullName = requestHeaders.get("oai-authenticated-user-full-name");
-  const fullName =
-    encodedFullName &&
-    requestHeaders.get("oai-authenticated-user-full-name-encoding") ===
-      "percent-encoded-utf-8"
-      ? decodeURIComponent(encodedFullName)
-      : null;
-
-  const displayName = fullName ?? email;
-  // ...
-}
+```bash
+git clone https://github.com/QCYTSN/qcytsn.github.io.git
+cd qcytsn.github.io
+npm ci
+npm run dev
 ```
 
-## Optional Dispatch-Owned ChatGPT Sign-In
+Then open the local URL printed by Vite.
 
-Import the ready-to-use helpers from `app/chatgpt-auth.ts` when the site needs
-optional or required ChatGPT sign-in:
+Useful commands:
 
-- Use `getChatGPTUser()` for optional signed-in UI.
-- Use `requireChatGPTUser(returnTo)` for server-rendered pages that should send
-  anonymous visitors through Sign in with ChatGPT.
-- Use `chatGPTSignInPath(returnTo)` and `chatGPTSignOutPath(returnTo)` for
-  browser links or actions.
-- Pass a same-origin relative `returnTo` path for the destination after sign-in
-  or sign-out. The helper validates and safely encodes it.
-- Mark protected pages with `export const dynamic = "force-dynamic"` because
-  they depend on per-request identity headers.
+```bash
+npm run dev          # start the development server
+npm run lint         # run ESLint
+npm run typecheck    # check TypeScript
+npm test             # run the full validation suite
+npm run build:pages  # create the static GitHub Pages build
+npm run build        # create and validate the Worker build
+```
 
-Dispatch owns `/signin-with-chatgpt`, `/signout-with-chatgpt`, `/callback`, the
-OAuth cookies, and identity header injection. Do not implement app routes for
-those reserved paths. Routes that do not import and call the helper remain
-anonymous-compatible.
+## Deployment
 
-SIWC establishes identity only; it does not prove workspace membership. Use the
-Sites hosting platform's access policy controls for workspace-wide restrictions,
-or enforce explicit server-side membership or allowlist checks.
+The same source supports two deployment targets:
 
-Use SIWC for account pages, user-specific dashboards, saved records, and write
-actions tied to the current ChatGPT user. Leave public content anonymous.
+| Target | URL | Build |
+| --- | --- | --- |
+| GitHub Pages | [qcytsn.github.io](https://qcytsn.github.io) | `npm run build:pages` |
+| Primary site | [peanut-ai.dev](https://peanut-ai.dev) | `npm run build` |
 
-## Diagnostic Commands
+Pushes to `main` are built and published to GitHub Pages by [GitHub Actions](./.github/workflows/deploy-pages.yml). The Worker build is prepared through Vinext for the primary deployment.
 
-- `npm run install:ci`: perform the one bounded lockfile install
-- `npm run dev`: start the Vite/Vinext development server
-- `npm run build`: build and validate the deployable Sites artifact
-- `npm run start`: start the built Vinext application
-- `npm test`: build, validate, and verify the rendered development-preview metadata
-- `npm run validate:artifact`: recheck an existing artifact's manifest and ESM `default.fetch` export
-- `npm run db:generate`: generate Drizzle migrations after schema changes
+## Repository map
 
-Use build and validation commands for targeted diagnosis after a remote failure, not as part of the normal checkpoint path.
+```text
+app/                  portfolio pages, content, and interactions
+public/images/        portfolio artwork and research figures
+public/papers/        project reports
+db/                   optional D1 and Drizzle setup
+scripts/              build and validation helpers
+tests/                content and rendered-output checks
+.github/workflows/    GitHub Pages deployment
+```
 
-The timeout defaults can be overridden for a controlled canary with `SITES_INSTALL_TIMEOUT`, `SITES_INSTALL_KILL_AFTER`, `SITES_BUILD_TIMEOUT`, and `SITES_BUILD_KILL_AFTER`. A timeout fails the command; the helpers never retry an unchanged install or build.
+## Contact
 
-## Learn More
-
-- [vinext Documentation](https://github.com/cloudflare/vinext)
-- [Drizzle D1 Guide](https://orm.drizzle.team/docs/get-started/d1-new)
+Fengkai Gao · [GitHub](https://github.com/QCYTSN) · [Email](mailto:t330034007@mail.bnbu.edu.cn)
