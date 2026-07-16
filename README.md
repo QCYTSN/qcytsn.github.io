@@ -18,7 +18,7 @@
 </div>
 
 <a href="https://qcytsn.github.io">
-  <img src="./public/images/hero/optical-specimen-premium-composite.png" alt="Optical specimen artwork from the portfolio" />
+  <img src="./public/readme-preview.png" alt="Latest Fengkai Gao AI research portfolio home page" />
 </a>
 
 ## About
